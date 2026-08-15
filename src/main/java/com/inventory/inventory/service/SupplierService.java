@@ -1,10 +1,12 @@
 package com.inventory.inventory.service;
 
+import com.inventory.inventory.exception.InvalidStockOperationException;
 import com.inventory.inventory.exception.ResourceNotFoundException;
 import com.inventory.inventory.model.Supplier;
 import com.inventory.inventory.repository.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 
@@ -42,6 +44,13 @@ public class SupplierService {
 
     public void deleteSupplier(Long id) {
         Supplier existing = getSupplierById(id);
-        supplierRepository.delete(existing);
+        try {
+            supplierRepository.delete(existing);
+        } catch (DataIntegrityViolationException ex) {
+            throw new InvalidStockOperationException(
+                "Cannot delete supplier '" + existing.getName() + "' — it has existing purchase orders. " +
+                "Remove or reassign those orders first."
+            );
+        }
     }
 }

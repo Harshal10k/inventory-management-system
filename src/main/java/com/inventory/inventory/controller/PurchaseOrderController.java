@@ -35,6 +35,7 @@ public class PurchaseOrderController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE_STAFF')")
     public ResponseEntity<PurchaseOrder> createOrder(@Valid @RequestBody PurchaseOrderRequest request) {
         PurchaseOrder created = purchaseOrderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
