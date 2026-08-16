@@ -52,13 +52,15 @@ public class ProductService {
 		productRepository.delete(existing);
 	}
 	
-	public List<Product> filterProducts(String category, Integer minQty, Integer maxQty, LocalDateTime fromDate, LocalDateTime toDate) {
+	public List<Product> filterProducts(String category, Integer minQty, Integer maxQty, LocalDateTime fromDate, LocalDateTime toDate, Double maxPrice, Boolean lowStockOnly) {
 		Specification<Product> spec = Specification
 				.where(ProductSpecification.hasCategory(category))
 				.and(ProductSpecification.hasMinQuantity(minQty))
 				.and(ProductSpecification.hasMaxQuantity(maxQty))
 				.and(ProductSpecification.createdAfter(fromDate))
-				.and(ProductSpecification.createdBefore(toDate));
+				.and(ProductSpecification.createdBefore(toDate))
+				.and(ProductSpecification.hasMaxPrice(maxPrice))
+				.and(ProductSpecification.isLowStock(lowStockOnly));
 
 		return productRepository.findAll(spec);
 	}
