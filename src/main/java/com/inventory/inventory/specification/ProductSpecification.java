@@ -51,4 +51,23 @@ public class ProductSpecification {
             return cb.lessThanOrEqualTo(root.get("createdAt"), toDate);
         };
     }
+    public static Specification<Product> hasMaxPrice(Double maxPrice) {
+        return (root, query, cb) -> {
+            if (maxPrice == null) {
+                return cb.conjunction();
+            }
+            return cb.lessThanOrEqualTo(root.get("unitPrice"), maxPrice);
+        };
+    }
+
+    public static Specification<Product> isLowStock(Boolean lowStockOnly) {
+        return (root, query, cb) -> {
+            if (lowStockOnly == null || !lowStockOnly) {
+                return cb.conjunction();
+            }
+            // lowStock is computed as quantityInStock < reorderThreshold — replicate that comparison
+            // directly in the query since @Transient methods aren't queryable via JPA Criteria
+            return cb.lessThan(root.get("quantityInStock"), root.get("reorderThreshold"));
+        };
+    }
 }
